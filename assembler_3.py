@@ -185,9 +185,9 @@ def TypeE(L):              #to be done !!
     elif L[0]=="je":
         s="01111"
 
-    #address=memory_address_data[L[1]]
+    address=labels[L[1]]
     #s+="0"*3+L[1]
-    s+="0"*3#+address
+    s+="0"*3+address
     return s
 
 def TypeF(L):  #this is halt(hlt)
@@ -238,7 +238,9 @@ for instruction in list_of_instructions:
         memory_address_data[instruction[1]]=''
 
     if(instruction[0][-1]==':'):
-        labels[instruction[0][-2::-1]]=line_number
+        len_of_label=len(instruction[0])-1
+        num1=line_number
+        labels[instruction[0][0:len_of_label:+1]]=bin8(num1)#line_number
         instruction.pop(0)
     if instruction[0] in type_A  :
         '''reg1=instruction[1]
@@ -295,7 +297,7 @@ for instruction in list_of_instructions:
         #mem=instruction[1]
         instruction_line_number_count+=1
         line_number+=1
-        binary_string=TypeE=(instruction)
+        binary_string=TypeE(instruction)
 
     elif instruction[0] in type_F :#=="st"):
         '''reg1=instruction[1]
