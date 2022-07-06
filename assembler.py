@@ -1,142 +1,162 @@
-from re import T
 from sys import stdin
 
+def listToString(s):
+    str1 = "" 
+    for i in s:
+        str1 =str1+i+" "  
+    return str1
+
 def space_error(line):
-    #i have a line like "hi i am   garv"
-    #4 words
-    #should have 3 spaces
     words=len(line.split())
     spaces=0
     for i in line:
         if i==" ":
             spaces+=1
     if spaces!=words-1:
-        print("Invalid spaces in line number ") #line number
+        print("Invalid spaces in line ",list_of_instructions.index(line.split()))
         exit(0)
-
 
 def var_after_instruction():
     i=0
-    while(list_of_instructions[i][0]=="var"):
+    while(list_of_instructions[i]=="" or list_of_instructions[i][0]=="var"):
         i=i+1
-    for j in range(i,len(list_of_instructions)):
-        if(list_of_instructions[j][0]=="var"):
-            print("variable decleration after an instruction .. , they must be defined at the beginning") #line number
+    for j in range(i+1,len(list_of_instructions)):
+        if(list_of_instructions[j]!="" and list_of_instructions[j][0]=="var"):
+            print("Variable declaration after an instruction at line ",j)
             exit(0)
-
+        
 def hlt_error():
     c=0
     for i in list_of_instructions:
+        if(i==''):
+            continue
         if i[0]=="hlt":
             c+=1
     if c>1:
         print("More than one hlt statements")
         exit(0)
-    if list_of_instructions[-1][0]!="hlt":
+    if list_of_instructions[-1][-1]!="hlt":
         print("Last statement is not hlt")
         exit(0)
 
+def check_error():
+    x = None
+    for i in list_of_instructions:
+        if(i==''):
+            continue
+        x = error(i)
+        if (x == None):
+            continue
+        else:
+            exit(0)
+            return
 
 def error(l):
-    
+
     if (l[0] != "var" and l[0] not in all):
-        print("Invalid syntax in line number") #line number
+        print("Invalid operation in line ",list_of_instructions.index(l))
         return True
     
-    elif (l[0]=="var" and (l[1] in all or l[1][0].isdigit())):
-        print("Invalid variable name at line")
+    elif (l[0]=="var" and ((l[1] in all))): #or (l[1][0] in ['0','1','2','3','4','5','6','7','8','9']))):
+        print("Invalid variable name at line ",list_of_instructions.index(l))
         return True
     
     elif ((l[0]== 'jmp' or l[0] == 'jlt' or l[0] == 'jgt' or l[0] == 'je') and (l[1] in list(memory_address_data.keys()) or (l[1] in reg.keys() and l[0][1] !="FLAGS"))):
-        print("Illegal memory address "+str(l[1]))
+        print("Invalid memory address at line",list_of_instructions.index(l))
         return True
     
     # to check errors in A type instructions
     elif (l[0] == "add" or l[0] == "sub" or l[0] == "mul" or l[0] == "xor" or l[0] == "or" or l[0] == "and"):
         if (len(l) != 4):
-            print("Wrong syntax used for instructions in line") #line number
+            print("More or less arguments passed in line ",list_of_instructions.index(l))
             return True
         if(l[1]=="FLAGS" or l[2]=="FLAGS" or l[3]=="FLAGS"):
-            print("Illegal use of flags register at line ") #line number
+            print("Invalid use of flags register at line ",list_of_instructions.index(l))
             return True
         elif (l[1] not in list(reg.keys()) or l[2] not in list(reg.keys()) or l[3] not in list(reg.keys())):
-            print("Invalid register name in line") #line number
+            print("Invalid register name in line ",list_of_instructions.index(l))
             return True
 
     # to check errors in both mov type instructions
     elif(l[0]=="mov"):
         if len(l)!=3:
-            print("Wrong syntax used for instructions in line") #line number
+            print("More or less arguments passed in line ",list_of_instructions.index(l))
             return True
 
         elif (l[1] == "FLAGS"):
-            print("Illegal use of flags register at line ") #line number
+            print("Invalid use of flags register at line ",list_of_instructions.index(l))
             return True
         elif(l[2][1]=="R"):
             if(l[2] not in list(reg.keys())):
-                print("Invalid register name in line ") #line number
+                print("Invalid register name in line ",list_of_instructions.index(l))
                 return True
         elif(l[2][1]=="$"):
             if (int(l[2][1:],10)<0 and int(l[2][1:],10)>255):
-                print("Invalid immidiete in line "+str(l[1]))
+                print("Invalid immidiete in line ",list_of_instructions.index(l))
                 return True
     
     # to check errors in B type instructions
     elif ( l[0] == "rs" or l[0] == "ls"):
         if (len(l) != 3):
-            print("Wrong syntax used for instructions in line "+str(l[1]))
+            print("More or less arguments passed in line ",list_of_instructions.index(l))
             return True
         if (l[1] == "FLAGS" or l[2]=="FLAGS"):
-            print("Illegal use of flags register")
+            print("Invalid use of flags register in line ",list_of_instructions.index(l))
             return True
         elif (l[1] not in list(reg.keys())):
-            print("Invalid register name in line")  #line number
+            print("Invalid register name in line ",list_of_instructions.index(l))  #line number
             return True
         elif(l[2][1]=="$"):
             if (int(l[2][1:],10)<0 and int(l[2][1:],10)>255):
-                print("Invalid immidiete in line "+str(l[1]))
+                print("Invalid immidiete in line ",list_of_instructions.index(l))
                 return True
 
     # to check errors in C type instructions
     elif (l[0]== "div" or l[0] == "not" or l[0] == "cmp"):
         if (len(l) != 3):
-            print("Wrong syntax used for instructions in line "+str(l[1]))
+            print("More or less arguments passed in line ",list_of_instructions.index(l))
             return True
         if(l[1]=="FLAGS" or l[2]=="FLAGS"):
-            print("Illegal use of flags register")
+            print("Invalid use of flags register in line ",list_of_instructions.index(l))
             return True
         elif (l[1] not in list(reg.keys()) or l[2] not in list(reg.keys())):
-            print("Invalid register name in line "+str(l[1]))
+            print("Invalid register name in line ",list_of_instructions.index(l))
             return True
 
     # to check errors in D type instructions
     elif (l[0] == "ld" or l[0] == "st"):
         if (len(l) != 3):
-            print("Wrong syntax used for instructions in line "+str(l[1]))
+            print("More or less arguments passed in line ",list_of_instructions.index(l))
             return True
         elif(l[1]=="FLAGS"):
-            print("Illegal use of flags register")
+            print("Illegal use of flags register in line ",list_of_instructions.index(l))
             return True
         elif (l[1] not in list(reg.keys())):
-            print("Invalid register name in line "+str(l[1]))
+            print("Invalid register name in line ",list_of_instructions.index(l))
+            return True
+        elif l[1] in list(labels.keys()):
+            print("Use of labels instead of variable in line ",list_of_instructions.index(l))
             return True
         elif l[2] not in list(memory_address_data.keys()):
-            print("Invalid memory address in line "+str(l[1]))
+            print("Invalid memory address in line ",list_of_instructions.index(l))
             return True
     
     # to check errors in E type instructions
     elif (l[0] == "jmp" or l[0] == "jlt" or l[0] == "jgt" or l[0] == "je"):
         if (len(l) != 2):
-            print("Wrong syntax used for instructions in line "+str(l[1]))
+            print("More or less arguments passed in line ",list_of_instructions.index(l))
             return True
-        if l[1] not in list(labels.keys()):
-            print("Invalid  memory address in line "+str(l[1]))
+        if l[1] in list(memory_address_data.keys()):
+            print("Use of variable instead of label in line ",list_of_instructions.index(l))
+            return True
+        elif l[1] not in list(labels.keys()):
+            print("Invalid  memory address in line ",list_of_instructions.index(l))
             return True
     
     # to check errors in F type instructions
     elif (l[0] == "hlt"):
         if (len(l) != 1):
-            print("Wrong syntax used for instructions in line "+str(l[1]))
+            print("hlt instruction does bot have any arguments ",list_of_instructions.index(l))
             return True
 
 
@@ -217,9 +237,16 @@ def TypeA(L):
     #     reg3=reg[L[3]][1]
     #     reg3=int(reg1 and reg2)
     #     reg[L[3]][1]=reg3
-        
-    s+="0"*2+reg[L[1]][0]+reg[L[2]][0]+reg[L[3]][0]
-    return s
+
+    try: 
+        s+="0"*2+reg[L[1]][0]+reg[L[2]][0]+reg[L[3]][0]
+        return s
+    except KeyError:
+        print("Invalid syntax, undefined registers being used in line",list_of_instructions.index(L))
+        exit(0)
+    except IndexError:
+        print("Invalid syntax, less arguments passed in line",list_of_instructions.index(L))
+        exit(0)
 
 def TypeB(L):
     if L[0]=="mov":
@@ -228,95 +255,120 @@ def TypeB(L):
 
     elif L[0]=="rs":
         s="11000"
-        '''imm_in_binary=str(bin8(int(L[2][1:])))
-        imm_in_decimal=bin(imm_in_binary)[2:]
-        imm_in_binary=int(imm_in_binary)
-        reg1=reg[L[1]][1]
-        reg1=imm_in_binary
-        reg[L[1]][1]=reg1'''
+        # imm_in_binary=str(bin8(int(L[2][1:])))
+        # imm_in_decimal=bin(imm_in_binary)[2:]
+        # imm_in_binary=int(imm_in_binary)
+        # reg1=reg[L[1]][1]
+        # reg1=imm_in_binary
+        # reg[L[1]][1]=reg1
 
     elif L[0]=="ls":
         s="11001"
-        '''imm_in_binary=str(bin8(int(L[2][1:])))
-        imm_in_decimal=bin(imm_in_binary)[2:]
-        imm_in_binary=int(imm_in_binary)
-        reg1=reg[L[1]][1]
-        reg1=imm_in_binary
-        reg[L[1]][1]=reg1'''
-        
-    s+=reg[L[1]][0]+bin8(int(L[2][1:]))
-    return s
+        # imm_in_binary=str(bin8(int(L[2][1:])))
+        # imm_in_decimal=bin(imm_in_binary)[2:]
+        # imm_in_binary=int(imm_in_binary)
+        # reg1=reg[L[1]][1]
+        # reg1=imm_in_binary
+        # reg[L[1]][1]=reg1
+    
+    num=int(L[2][1:])
+    if(num>255 or num<0):
+        print("Invalid value of immediate in line",list_of_instructions.index(L))
+        exit(0)
+    try:  
+        s+=reg[L[1]][0]+bin8(int(L[2][1:]))
+        return s
+    except KeyError:
+        print("Invalid syntax, undefined registers being used in line ",list_of_instructions.index(L))
+        exit(0)
+    except IndexError:
+        print("Invalid syntax, less arguments passed in line",list_of_instructions.index(L))
+        exit(0)
 
 def TypeC(L):
     
     if L[0]=="mov":
         s="10011"
-        '''reg1=reg[L[1]][1]
-        reg2=reg[L[2]][1]
-        reg2=reg1
-        reg[L[2]][1]=reg2'''
+        # reg1=reg[L[1]][1]
+        # reg2=reg[L[2]][1]
+        # reg2=reg1
+        # reg[L[2]][1]=reg2
 
     elif L[0]=="div":
         s="10111"
-        '''reg1=reg[L[1]][1]
-        reg0=reg[L[0]][1]
-        reg3=reg[L[3]][1]
-        reg4=reg[L[4]][1]
-        reg0=reg3//reg4
-        reg1=reg3%reg4'''
-
-        '''reg[L[0]][1]=reg0
-        reg[L[1]][1]=reg1'''
+        # reg1=reg[L[1]][1]
+        # reg0=reg[L[0]][1]
+        # reg3=reg[L[3]][1]
+        # reg4=reg[L[4]][1]
+        # reg0=reg3//reg4
+        # reg1=reg3%reg4
+        # reg[L[0]][1]=reg0
+        # reg[L[1]][1]=reg1
 
     elif L[0]=="not":
         s="11101"
-        '''reg1=reg[L[1]][1]
-        reg2=reg[L[2]][1]
-        reg2=~reg1
-        reg[L[2]][1]=reg2'''
+        # reg1=reg[L[1]][1]
+        # reg2=reg[L[2]][1]
+        # reg2=~reg1
+        # reg[L[2]][1]=reg2
 
-    elif L[0]=="cmp":          #to be changed  !!
+    elif L[0]=="cmp":        
         s="11110"
-        '''reg1=reg[L[1]][1]
-        reg2=reg[L[2]][1]'''
+        # reg1=reg[L[1]][1]
+        # reg2=reg[L[2]][1]
+        # if(reg1>reg2):
+        #     reg['flags'][1][-2]=1
+        # elif(reg1<reg2):
+        #     reg['flags'][1][-3]=1
+        # elif(reg1==reg2):
+        #     reg['flags'][1][-1]=1
         
-        '''if(reg1>reg2):
-            reg['flags'][1][-2]=1
-        elif(reg1<reg2):
-            reg['flags'][1][-3]=1
-        elif(reg1==reg2):
-            reg['flags'][1][-1]=1'''
-        
-
-    s+="0"*5+reg[L[1]][0]+reg[L[2]][0]
-    return s
+    try:
+        s+="0"*5+reg[L[1]][0]+reg[L[2]][0]
+        return s
+    except KeyError:
+        print("Invalid syntax, undefined registers being used in line",list_of_instructions.index(L))
+        exit(0)
+    except IndexError:
+        print("Invalid syntax, less arguments passed in line",list_of_instructions.index(L))
+        exit(0)
 
 def TypeD(L):
     if L[0]=="ld":
         s="10100" 
-        '''reg1=reg[L[1]][1]
-        val=memory_address_data[L[2]]
-        reg1=val
-        reg[L[1]][1]=reg1'''
+        # reg1=reg[L[1]][1]
+        # val=memory_address_data[L[2]]
+        # reg1=val
+        # reg[L[1]][1]=reg1
         
     elif L[0]=="st":
         s="10101"
-        '''reg1=reg[L[1]][1]
-        memory_address_data[L[2]]=reg1
-        reg[L[1]][1]=reg1'''
+        # reg1=reg[L[1]][1]
+        # memory_address_data[L[2]]=reg1
+        # reg[L[1]][1]=reg1
 
-    address=memory_address_data[L[2]]
+    #address=memory_address_data[L[2]]
+    # if(address==''):
+    #     print("Invalid syntax at line",line_number+line_adjustment-1)
+    #     exit(0)
+    try: 
+        address=memory_address_data[L[2]]
+        s+=reg[L[1]][0]+address
+        return s
+    except KeyError:
+        print("Invalid syntax, undefined variable or register being used in line",list_of_instructions.index(L))
+        exit(0)
+    except IndexError:
+        print("Invalid syntax, less arguments passed in line",list_of_instructions.index(L))
+        exit(0)
 
-    s+=reg[L[1]][0]+address
-    return s
 
 
+def TypeE(L):  
 
-def TypeE(L):              #to be done !!
     if L[0]=="jmp":
         s="11111"
-        
-              
+                
     elif L[0]=="jlt":
         s="01100"
 
@@ -326,16 +378,25 @@ def TypeE(L):              #to be done !!
     elif L[0]=="je":
         s="01111"
 
-    address=labels[L[1]]
-    #s+="0"*3+L[1]
-    s+="0"*3+address
-    return s
+    try:
+        address=labels[L[1]]
+        # if(address==''):
+        #     print("Invalid syntax at line",line_number+line_adjustment-1)
+        #     exit(0)
+
+        s+="0"*3+address
+        return s
+    except KeyError:
+        print("Invalid syntax, undefined labels being used in line",list_of_instructions.index(L))
+        exit(0)
+    except IndexError:
+        print("Invalid syntax, less arguments passed in line",list_of_instructions.index(L))
+        exit(0)
 
 def TypeF(L):  #this is halt(hlt)
+    
     s="01010"+"0"*11
     return s
-
-
 
 reg = {'R0': ['000', 0],
        'R1': ['001', 0],
@@ -354,7 +415,7 @@ type_D=["ld","st"]
 type_E=["jmp","jgt","jlt","je"]
 type_F=["hlt"]
 
-all_inst = type_A+type_B+type_C+type_D+type_E+type_F
+all= type_A+type_B+type_C+type_D+type_E+type_F
 
 
 memory_address_data={}
@@ -366,123 +427,179 @@ binary_string=''
 instruction_line_number_count=-1
 variables_list_ld_st=[]
 
+line_adjustment=-1
+
+# Taking input file
 for line in stdin:
     line=line.strip()
-    '''if line=="hlt":
-        break'''
-    space_error(line)
+    if (line==''):
+        #line_adjustment+=1
+        list_of_instructions.append(line)
+        continue
+
     instruction=line.split()
+    
     list_of_instructions.append(instruction)
 
+# for i in list_of_instructions:
+#     print(i)
+
 for instruction in list_of_instructions:
-    if(len(instruction)==0):
-        break
-    if(instruction[0]=='var'):
-        line_number+=1
-        memory_address_data[instruction[1]]=''
-
-    if(instruction[0][-1]==':'):
-        len_of_label=len(instruction[0])-1
-        num1=line_number
-        labels[instruction[0][0:len_of_label:+1]]=bin8(num1)#line_number
-        instruction.pop(0)
-    if instruction[0] in type_A  :
-        '''reg1=instruction[1]
-        reg2=instruction[2]
-        reg3=instruction[3]
-        add(reg1,reg2,reg3,reg,output_list)'''
-        instruction_line_number_count+=1
-        line_number+=1
-        binary_string=TypeA(instruction)
-
-    elif instruction[0] in type_B:
-        '''reg1=instruction[1]
-        reg2=instruction[2]
-        reg3=instruction[3]
-        sub(reg1,reg2,reg3,reg,output_list)'''
-        if(instruction[0]=="mov" and instruction[2][0]=='$'):
-            instruction_line_number_count+=1
-            line_number+=1
-            binary_string=TypeB(instruction)
-        elif(instruction[0]=="mov" and instruction[2][0]!='$'):
-            pass
-        else:
-            instruction_line_number_count+=1
-            line_number+=1
-            binary_string=TypeB(instruction)
-
-
-    elif instruction[0] in type_C:
-        '''reg1=instruction[1]
-        imm=instruction[2]
-        #reg3=instruction[3]
-        mov(reg1,imm,reg,output_list)'''
-        instruction_line_number_count+=1
-        line_number+=1
-        binary_string=TypeC(instruction)
-
-    elif instruction[0] in type_D:
-        '''reg1=instruction[1]
-        reg2=instruction[2]
-        #reg3=instruction[3]
-        mov(reg1,reg2,reg,output_list)'''
-        #mem=instruction[1]
-        variable=instruction[2]
-        variables_list_ld_st.append(variable)
-        instruction_line_number_count+=1
-        line_number+=1
-        binary_string=TypeD(instruction)
-
-    elif instruction[0] in type_E: 
-        '''mem1=instruction[2]
-        reg1=instruction[1]
-        #reg3=instruction[3]
-        ld(reg1,mem1,reg,output_list)'''
-        #mem=instruction[1]
-        instruction_line_number_count+=1
-        line_number+=1
-        binary_string=TypeE(instruction)
-
-    elif instruction[0] in type_F :
-        '''reg1=instruction[1]
-        mem1=instruction[2]
-        #reg3=instruction[3]
-        st(reg1,mem1,reg,output_list)'''
-        
-        instruction_line_number_count+=1
-        line_number+=1
-        binary_string=TypeF(instruction)
-
-    #instruction_line_number_count+=-1
     
+    if(len(instruction)!=0):
+        
+        if(instruction[0]=='var'):
+            line_number+=1
+            memory_address_data[instruction[1]]=''
+        
+        if(len(instruction)>1 and instruction[1]==':'):
+            line_number+=1
+            print("Invalid label name because of space before ':' in line",list_of_instructions.index(instruction))
+            exit(0)
+        
+        if(instruction[0][-1]==':'):
+            len_of_label=len(instruction[0])-1
+            instruction_line_number_count+=1
+            num1=instruction_line_number_count
+            labels[instruction[0][0:len_of_label:+1]]=bin8(num1)
+            instruction_line_number_count+=-1
+            instruction.pop(0)
+        
+        if(instruction[0][-1].isalnum()):
+            pass
+        
+        else:
+            print("Invalid syntax at line",list_of_instructions.index(instruction))
+            exit(0)
+        
+        if instruction[0] in type_A  :
+            # reg1=instruction[1]
+            # reg2=instruction[2]
+            # reg3=instruction[3]
+            # add(reg1,reg2,reg3,reg,output_list)
+            instruction_line_number_count+=1
+            line_number+=1
+            binary_string=TypeA(instruction)
 
-    output_list.append(binary_string)
+        elif instruction[0] in type_B:
+            # reg1=instruction[1]
+            # reg2=instruction[2]
+            # reg3=instruction[3]
+            # sub(reg1,reg2,reg3,reg,output_list)
+            try:
+                
+                if(instruction[0]=="mov" and instruction[2][0]=='$'):
+                    instruction_line_number_count+=1
+                    line_number+=1
+                    binary_string=TypeB(instruction)
+                
+                elif(instruction[0]=="mov" and instruction[2][0]!='$'):
+                    #pass
+                    instruction_line_number_count+=1
+                    line_number+=1
+                    #if()
+                    binary_string=TypeC(instruction)
+                else:
+                    instruction_line_number_count+=1
+                    line_number+=1
+                    binary_string=TypeB(instruction)
+                #elif
+            except IndexError:
+                print("Invalid syntax, less arguments passed in line",list_of_instructions.index(instruction))
+                exit(0)
+
+
+        elif instruction[0] in type_C:
+            # '''reg1=instruction[1]
+            # imm=instruction[2]
+            # #reg3=instruction[3]
+            # mov(reg1,imm,reg,output_list)'''
+            instruction_line_number_count+=1
+            line_number+=1
+            binary_string=TypeC(instruction)
+
+        elif instruction[0] in type_D:
+            # '''reg1=instruction[1]
+            # reg2=instruction[2]
+            # #reg3=instruction[3]
+            # mov(reg1,reg2,reg,output_list)'''
+            #mem=instruction[1]
+            try:
+                variable=instruction[2]
+                variables_list_ld_st.append(variable)
+                instruction_line_number_count+=1
+                line_number+=1
+                binary_string=TypeD(instruction)
+            
+            except IndexError:
+                print("Invalid syntax, less arguments passed in line",list_of_instructions.index(instruction))
+                exit(0)
+
+        elif instruction[0] in type_E: 
+            # '''mem1=instruction[2]
+            # reg1=instruction[1]
+            # #reg3=instruction[3]
+            # ld(reg1,mem1,reg,output_list)'''
+            #mem=instruction[1]
+            instruction_line_number_count+=1
+            line_number+=1
+            binary_string=TypeE(instruction)
+
+        elif instruction[0] in type_F :
+            # '''reg1=instruction[1]
+            # mem1=instruction[2]
+            # #reg3=instruction[3]
+            # st(reg1,mem1,reg,output_list)'''
+            instruction_line_number_count+=1
+            line_number+=1
+            binary_string=TypeF(instruction)
+        
+        # '''var_after_instruction()
+        # hlt_error()
+        # check_error()'''
+        # '''print("\n")
+        # print("line number is ",line_number)
+        # print("line adjustment is ",line_adjustment)
+        # print("\n")'''
+        output_list.append(binary_string)
+
+k=-1
+#print("len of list\n",len(list_of_instructions))
+#print("now printing again\n")
+while(list_of_instructions[k]==''):
+    #print("yes\n")
+    list_of_instructions.pop(k)
+    #k=k-1
+
+# '''for i in list_of_instructions:
+#     print(i)'''
 
 instruction_line_number_count+=1
+
+all=all+list(labels.keys())
+
+var_after_instruction()
+hlt_error()
+check_error()
+
 for key in memory_address_data:
     num=instruction_line_number_count
     memory_address_data[key]=bin8(num)
     instruction_line_number_count+=1
 
-'''d1={1:1,2:3,3:4}
-l=list(d1.values())'''
-
 list_of_values=list(memory_address_data.values())
-
-
 
 j=0
 for i in range(len(output_list)):
     if(len(output_list[i])==8):
-        output_list[i]=output_list[i]+memory_address_data[variables_list_ld_st[j]]#list_of_values[j] #bin8(instruction_line_number_count)
+        output_list[i]=output_list[i]+memory_address_data[variables_list_ld_st[j]]
         instruction_line_number_count+=1
         j+=1
 
-'''for i in range(len(output_list)):
-    if(len(output_list[i])==9):
-        output_list[index(i)]=i+list_of_values[j] #bin8(instruction_line_number_count)
-        instruction_line_number_count+=1
-        j+=1'''
-
+output_line=0
 for i in output_list:
+    if(output_line==256):
+        print("Storage full! Output exceeding 256 lines")
+        exit(0)
+    output_line+=1
     print(i)
