@@ -1,5 +1,45 @@
 from sys import stdin
 
+def binarytodecimal(str1):
+    lenstr1=len(str1)
+    decimal=0
+    count=0
+    while lenstr1>0:
+        decimal+=(2**(lenstr1-1)*(int(str1[count])))
+        lenstr1-=1
+        count+=1
+    return decimal
+
+def decimaltobinary(str1):
+    num1=int(str1)
+    str2=''
+    quotient=1
+    while quotient!=0:
+        quotient=num1//2
+        remainder=num1%2
+        str2+=str(remainder)
+        num1=quotient
+    str3=str2[::-1]
+    return str3
+
+def convert_afterdec(n):
+    rem=1
+    ans=0
+    ans_str=''
+    while(rem!=0):
+        n=n*2
+        if(n==1):
+            ans_str+='1'
+            break
+        elif(n>1):
+            ans_str+='1'
+            ans=n-1
+        elif(n<1):
+            ans_str=ans_str+'0'
+            ans=n
+        n=ans
+    return ans_str
+
 def listToString(s):
     str1 = "" 
     for i in s:
@@ -398,6 +438,166 @@ def TypeF(L):  #this is halt(hlt)
     s="01010"+"0"*11
     return s
 
+def TypeG(L):
+    s=''
+    if L[0]=="addf":
+        s="00000"
+    #     reg1=reg[L[1]][1]
+    #     reg2=reg[L[2]][1]
+    #     reg3=reg[L[3]][1]
+    #     reg3=reg1+reg2
+    #     # if len(str(decitobase(reg3,2)))>max(len(str(decitobase(reg2,2)))),len(str(decitobase(reg1,2))):
+    #     #     reg['flags'][1][-4]=1
+    #     if len(bin(reg3)[2:])>3:
+    #         reg['flags'][1][-4]=1
+    #     reg[L[3]][1]=reg3
+  
+    elif L[0]=="subf":
+        s="00001"
+    #     reg1=reg[L[1]][1]
+    #     reg2=reg[L[2]][1]
+    #     reg3=reg[L[3]][1]
+    #     reg3=reg1-reg2
+    #     # if len(str(decitobase(reg3,2)))>max(len(str(decitobase(reg2,2)))),len(str(decitobase(reg1,2))):
+    #     #     reg['flags'][1][-4]=1
+    #     if len(bin(reg3)[2:])>3:
+    #         reg['flags'][1][-4]=1
+    #     reg[L[3]][1]=reg3
+        
+    '''elif L[0]=="mul":
+        s="10110"
+    #     reg1=int(reg[L[1]][1])
+    #     reg2=int(reg[L[2]][1])
+    #     reg3=int(reg[L[3]][1])
+    #     reg3=reg1*reg2
+    #     # if len(reg3)>len(reg2)+len(reg1):
+    #     #     reg['flags'][1][-4]=1
+    #     if len(bin(reg3)[2:])>3:
+    #         reg['flags'][1][-4]=1
+    #     reg[L[3]][1]=reg3
+
+    elif L[0]=="xor":
+        s="11010"
+    #     reg1=reg[L[1]][1]
+    #     reg2=reg[L[2]][1]
+    #     reg3=reg[L[3]][1]
+    #     reg3=reg1^reg2
+    #     reg[L[3]][1]=reg3
+
+    elif L[0]=="or":
+        s="11011"
+    #     reg1=reg[L[1]][1]
+    #     reg2=reg[L[2]][1]
+    #     reg3=reg[L[3]][1]
+    #     reg3=int(reg1 or reg2)
+    #     reg[L[3]][1]=reg3
+        
+    elif L[0]=="and":   
+        s="11100"
+    #     reg1=reg[L[1]][1]
+    #     reg2=reg[L[2]][1]
+    #     reg3=reg[L[3]][1]
+    #     reg3=int(reg1 and reg2)
+    #     reg[L[3]][1]=reg3'''
+
+    try: 
+        s+="0"*2+reg[L[1]][0]+reg[L[2]][0]+reg[L[3]][0]
+        return s
+    except KeyError:
+        print("Invalid syntax, undefined registers being used in line",list_of_instructions.index(L))
+        exit(0)
+    except IndexError:
+        print("Invalid syntax, less arguments passed in line",list_of_instructions.index(L))
+        exit(0)
+
+def TypeH(L):
+    if L[0]=="movf":
+        s="00010"
+        #reg[L[1]][1]=L[2][1:]
+
+    '''elif L[0]=="rs":
+        s="11000"
+        # imm_in_binary=str(bin8(int(L[2][1:])))
+        # imm_in_decimal=bin(imm_in_binary)[2:]
+        # imm_in_binary=int(imm_in_binary)
+        # reg1=reg[L[1]][1]
+        # reg1=imm_in_binary
+        # reg[L[1]][1]=reg1
+
+    elif L[0]=="ls":
+        s="11001"
+        # imm_in_binary=str(bin8(int(L[2][1:])))
+        # imm_in_decimal=bin(imm_in_binary)[2:]
+        # imm_in_binary=int(imm_in_binary)
+        # reg1=reg[L[1]][1]
+        # reg1=imm_in_binary
+        # reg[L[1]][1]=reg1'''
+    
+    #num=float(L[2][1:])
+    num=float(L[2])
+    if(num>252 or num<0):
+        print("Invalid value of immediate in line",list_of_instructions.index(L))
+        exit(0)
+    try:  
+        sum_left_dec, sum_right_dec = str(num).split(".")
+        #len_rt=len(sum_right_dec)
+        sum_left_dec=decimaltobinary(sum_left_dec)
+        #print("sum left",sum_left_dec)
+        if(sum_right_dec!='0'):
+            sum_right_dec='0.'+sum_right_dec
+            sum_right_dec=float(sum_right_dec)
+            
+            sum_right_dec=convert_afterdec(sum_right_dec)
+        #print("sum right",sum_right_dec)
+            len_rt=len(sum_right_dec)
+
+        else:
+            len_rt=1
+        
+
+        sum_bin=sum_left_dec+'.'+sum_right_dec
+        sum_bin=float(sum_bin)
+        
+        
+        exp=0
+
+        mantissa=len(sum_left_dec)-1
+        sum_bin=sum_bin*(10**(-mantissa))
+        exp=mantissa
+
+        '''if(len_rt+mantissa>5):
+            print("error more than 5 mantissa bits")
+            exit(0)'''
+
+        str1=str(sum_bin)
+        str1=str1[2:]
+        while(len(str1)!=5):
+            str1=str1+'0'
+            #reg[]
+        if(exp>7 or exp<0):
+            print("invalid exponent")
+            exit(0)
+
+
+        str2=decimaltobinary(exp)
+        while(len(str2)!=3):
+            str2='0'+str2
+        str3=str2+str1
+
+
+
+        #s+=reg[L[1]][0]+bin8(int(L[2][1:]))
+        s+=reg[L[1]][0]+str3
+        return s
+        
+    except KeyError:
+        print("Invalid syntax, undefined registers being used in line ",list_of_instructions.index(L))
+        exit(0)
+    except IndexError:
+        print("Invalid syntax, less arguments passed in line",list_of_instructions.index(L))
+        exit(0)
+
+
 reg = {'R0': ['000', 0],
        'R1': ['001', 0],
        'R2': ['010', 0],
@@ -414,8 +614,10 @@ type_C=["mov","div","not","cmp"]
 type_D=["ld","st"]
 type_E=["jmp","jgt","jlt","je"]
 type_F=["hlt"]
+type_G=["addf","subf"]
+type_H=["movf"]
 
-all= type_A+type_B+type_C+type_D+type_E+type_F
+all= type_A+type_B+type_C+type_D+type_E+type_F+type_G+type_H
 
 
 memory_address_data={}
@@ -441,8 +643,159 @@ for line in stdin:
     
     list_of_instructions.append(instruction)
 
-# for i in list_of_instructions:
-#     print(i)
+'''for i in list_of_instructions:
+    print(i)'''
+
+'''for instruction in list_of_instructions:
+    if(instruction==''):
+        list_of_instructions.remove(i)'''
+
+for instruction in list_of_instructions:
+    
+    if(len(instruction)!=0):
+        
+        if(instruction[0]=='var'):
+            line_number+=1
+            memory_address_data[instruction[1]]=''
+        
+        if(len(instruction)>1 and instruction[1]==':'):
+            line_number+=1
+            print("Invalid label name because of space before ':' in line",list_of_instructions.index(instruction))
+            exit(0)
+        
+        if(instruction[0][-1]==':'):
+            len_of_label=len(instruction[0])-1
+            instruction_line_number_count+=1
+            num1=instruction_line_number_count
+            labels[instruction[0][0:len_of_label:+1]]=bin8(num1)
+            instruction_line_number_count+=-1
+            instruction.pop(0)
+            #continue
+        if(instruction==[]):
+            continue
+        #print(instruction)
+        #print("\n")
+        if(instruction[0][-1].isalnum()):
+            pass
+        
+        else:
+            print("Invalid syntax at line",list_of_instructions.index(instruction))
+            exit(0)
+        
+        if instruction[0] in type_A  :
+            # reg1=instruction[1]
+            # reg2=instruction[2]
+            # reg3=instruction[3]
+            # add(reg1,reg2,reg3,reg,output_list)
+            instruction_line_number_count+=1
+            line_number+=1
+            #binary_string=TypeA(instruction)
+
+        elif instruction[0] in type_B:
+            # reg1=instruction[1]
+            # reg2=instruction[2]
+            # reg3=instruction[3]
+            # sub(reg1,reg2,reg3,reg,output_list)
+            try:
+                
+                if(instruction[0]=="mov" and instruction[2][0]=='$'):
+                    instruction_line_number_count+=1
+                    line_number+=1
+                    #binary_string=TypeB(instruction)
+                
+                elif(instruction[0]=="mov" and instruction[2][0]!='$'):
+                    #pass
+                    instruction_line_number_count+=1
+                    line_number+=1
+                    #if()
+                    #binary_string=TypeC(instruction)
+                else:
+                    instruction_line_number_count+=1
+                    line_number+=1
+                    #binary_string=TypeB(instruction)
+                #elif
+            except IndexError:
+                print("Invalid syntax, less arguments passed in line",list_of_instructions.index(instruction))
+                exit(0)
+
+
+        elif instruction[0] in type_C:
+            # '''reg1=instruction[1]
+            # imm=instruction[2]
+            # #reg3=instruction[3]
+            # mov(reg1,imm,reg,output_list)'''
+            instruction_line_number_count+=1
+            line_number+=1
+            #binary_string=TypeC(instruction)
+
+        elif instruction[0] in type_D:
+            # '''reg1=instruction[1]
+            # reg2=instruction[2]
+            # #reg3=instruction[3]
+            # mov(reg1,reg2,reg,output_list)'''
+            #mem=instruction[1]
+            try:
+                variable=instruction[2]
+                variables_list_ld_st.append(variable)
+                instruction_line_number_count+=1
+                line_number+=1
+                #binary_string=TypeD(instruction)
+            
+            except IndexError:
+                print("Invalid syntax, less arguments passed in line",list_of_instructions.index(instruction))
+                exit(0)
+
+        elif instruction[0] in type_E: 
+            # '''mem1=instruction[2]
+            # reg1=instruction[1]
+            # #reg3=instruction[3]
+            # ld(reg1,mem1,reg,output_list)'''
+            #mem=instruction[1]
+            instruction_line_number_count+=1
+            line_number+=1
+            #binary_string=TypeE(instruction)
+
+        elif instruction[0] in type_F :
+            # '''reg1=instruction[1]
+            # mem1=instruction[2]
+            # #reg3=instruction[3]
+            # st(reg1,mem1,reg,output_list)'''
+            instruction_line_number_count+=1
+            line_number+=1
+
+        elif instruction[0] in type_G :
+            # '''reg1=instruction[1]
+            # mem1=instruction[2]
+            # #reg3=instruction[3]
+            # st(reg1,mem1,reg,output_list)'''
+            instruction_line_number_count+=1
+            line_number+=1
+            #binary_string=TypeF(instruction)
+        
+        elif instruction[0] in type_H :
+            # '''reg1=instruction[1]
+            # mem1=instruction[2]
+            # #reg3=instruction[3]
+            # st(reg1,mem1,reg,output_list)'''
+            instruction_line_number_count+=1
+            line_number+=1
+            #binary_string=TypeF(instruction)
+        
+        # '''var_after_instruction()
+        # hlt_error()
+        # check_error()'''
+        # '''print("\n")
+        # print("line number is ",line_number)
+        # print("line adjustment is ",line_adjustment)
+        # print("\n")'''
+        #output_list.append(binary_string)
+
+line_number=0
+binary_string=''
+instruction_line_number_count=-1
+#variables_list_ld_st=[]
+
+line_adjustment=-1
 
 for instruction in list_of_instructions:
     
@@ -553,6 +906,24 @@ for instruction in list_of_instructions:
             instruction_line_number_count+=1
             line_number+=1
             binary_string=TypeF(instruction)
+
+        elif instruction[0] in type_G  :
+            #reg1=instruction[1]
+            #reg2=instruction[2]
+            #reg3=instruction[3]
+            # add(reg1,reg2,reg3,reg,output_list)
+            instruction_line_number_count+=1
+            line_number+=1
+            binary_string=TypeG(instruction)
+
+        elif instruction[0] in type_H  :
+            #reg1=instruction[1]
+            #reg2=instruction[2]
+            #reg3=instruction[3]
+            # add(reg1,reg2,reg3,reg,output_list)
+            instruction_line_number_count+=1
+            line_number+=1
+            binary_string=TypeH(instruction)
         
         # '''var_after_instruction()
         # hlt_error()
